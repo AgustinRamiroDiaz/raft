@@ -1,0 +1,377 @@
+openapi: 3.0.3
+info:
+  title: Raft Consensus RPC API (Phase 1 - Leader Election)
+  description: |
+    HTTP API for Raft consensus algorithm inter-node communication.
+    Phase 1 scope: Leader election and term handling only (no log replication).
+
+    This API defines the contract between Raft nodes for consensus communication.
+    All endpoints are POST (RPC-style), not RESTful.
+  version: 1.0.0
+  contact:
+    name: Raft Consensus Implementation
+
+servers:
+  - url: http://localhost:8001
+    description: Example node 1
+  - url: http://localhost:8002
+    description: Example node 2
+  - url: http://localhost:8003
+    description: Example node 3
+
+tags:
+  - name: consensus
+    description: Raft consensus RPCs (node-to-node)
+  - name: ops
+    description: Operations/monitoring endpoints (frontend-to-node)
+
+paths:
+  /raft/request_vote:
+    post:
+      tags:
+        - consensus
+      summary: RequestVote RPC
+      description: |
+        Invoked by candidates to gather votes during leader election.
+
+        Receiver implementation:
+        - Grant vote if:
+          - request.term >= current_term
+          - voted_for is None OR voted_for == request.candidate_id
+        - Update current_term if request.term > current_term
+        - Persist voted_for before responding
+      operationId: requestVote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestVote'
+            examples:
+              basicRequest:
+                summary: Candidate node2 requesting vote in term 5
+                value:
+                  term: 5
+                  candidate_id: "node2"
+      responses:
+        '200':
+          description: Vote response (granted or denied)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestVoteResponse'
+              examples:
+                voteGranted:
+                  summary: Vote granted
+                  value:
+                    term: 5
+                    vote_granted: true
+                voteDenied:
+                  summary: Vote denied (already voted)
+                  value:
+                    term: 5
+                    vote_granted: false
+                higherTerm:
+                  summary: Responder has higher term
+                  value:
+                    term: 7
+                    vote_granted: false
+        '400':
+          description: Invalid request (malformed JSON or missing fields)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error (e.g., persistence failure)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /raft/append_entries:
+    post:
+      tags:
+        - consensus
+      summary: AppendEntries RPC (Heartbeat only in Phase 1)
+      description: |
+        Invoked by leader to:
+        - Send heartbeats to prevent follower election timeouts (Phase 1)
+        - Replicate log entries (Phase 2+, not implemented yet)
+
+        Phase 1 behavior:
+        - No log entries included
+        - Followers reset election timer on receiving valid AppendEntries
+        - Followers update leader_id to request.leader_id
+
+        Receiver implementation:
+        - Reply false if request.term < current_term
+        - Reply true if request.term >= current_term (valid heartbeat)
+        - Update current_term if request.term > current_term
+        - Revert to Follower if Candidate/Leader receives AppendEntries with >= term
+      operationId: appendEntries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppendEntries'
+            examples:
+              heartbeat:
+                summary: Leader heartbeat in term 5
+                value:
+                  term: 5
+                  leader_id: "node1"
+      responses:
+        '200':
+          description: Heartbeat acknowledgment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppendEntriesResponse'
+              examples:
+                success:
+                  summary: Heartbeat accepted
+                  value:
+                    term: 5
+                    success: true
+                staleTerm:
+                  summary: Leader has stale term
+                  value:
+                    term: 7
+                    success: false
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /ops/status:
+    get:
+      tags:
+        - ops
+      summary: Get node status
+      description: |
+        Returns current status of this Raft node.
+        Used by visualization frontend and monitoring tools.
+        Available even during elections or when node is not leader.
+      operationId: getStatus
+      responses:
+        '200':
+          description: Node status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeStatus'
+              examples:
+                leader:
+                  summary: Node is current leader
+                  value:
+                    node_id: "node1"
+                    state: "Leader"
+                    current_term: 5
+                    leader_id: "node1"
+                    cluster_peers: ["node2", "node3"]
+                follower:
+                  summary: Node is follower
+                  value:
+                    node_id: "node2"
+                    state: "Follower"
+                    current_term: 5
+                    leader_id: "node1"
+                    cluster_peers: ["node1", "node3"]
+                candidate:
+                  summary: Node is candidate (election in progress)
+                  value:
+                    node_id: "node3"
+                    state: "Candidate"
+                    current_term: 6
+                    leader_id: null
+                    cluster_peers: ["node1", "node2"]
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /ops/health:
+    get:
+      tags:
+        - ops
+      summary: Health check
+      description: Simple health check endpoint for load balancers and monitoring
+      operationId: getHealth
+      responses:
+        '200':
+          description: Node is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                example:
+                  status: "healthy"
+
+components:
+  schemas:
+    RequestVote:
+      type: object
+      required:
+        - term
+        - candidate_id
+      properties:
+        term:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Candidate's current term
+          example: 5
+        candidate_id:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: '^[a-zA-Z0-9_-]+$'
+          description: Candidate's node ID
+          example: "node2"
+      description: |
+        RequestVote RPC request.
+        Phase 1 version (no log fields).
+
+        Phase 2 will add:
+        - last_log_index: Index of candidate's last log entry
+        - last_log_term: Term of candidate's last log entry
+
+    RequestVoteResponse:
+      type: object
+      required:
+        - term
+        - vote_granted
+      properties:
+        term:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Responder's current term (for candidate to update itself)
+          example: 5
+        vote_granted:
+          type: boolean
+          description: True if candidate received vote
+          example: true
+      description: RequestVote RPC response
+
+    AppendEntries:
+      type: object
+      required:
+        - term
+        - leader_id
+      properties:
+        term:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Leader's current term
+          example: 5
+        leader_id:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: '^[a-zA-Z0-9_-]+$'
+          description: Leader's node ID
+          example: "node1"
+      description: |
+        AppendEntries RPC request.
+        Phase 1 version (heartbeat only, no log entries).
+
+        Phase 2 will add:
+        - prev_log_index: Index of log entry immediately preceding new ones
+        - prev_log_term: Term of prev_log_index entry
+        - entries: Array of log entries to replicate (empty for heartbeat)
+        - leader_commit: Leader's commit index
+
+    AppendEntriesResponse:
+      type: object
+      required:
+        - term
+        - success
+      properties:
+        term:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Responder's current term (for leader to update itself)
+          example: 5
+        success:
+          type: boolean
+          description: True if follower accepted heartbeat/entries
+          example: true
+      description: |
+        AppendEntries RPC response.
+        Phase 1: success indicates term validity.
+        Phase 2: success also indicates log consistency.
+
+    NodeStatus:
+      type: object
+      required:
+        - node_id
+        - state
+        - current_term
+        - leader_id
+        - cluster_peers
+      properties:
+        node_id:
+          type: string
+          description: This node's unique identifier
+          example: "node1"
+        state:
+          type: string
+          enum: [Follower, Candidate, Leader]
+          description: Current node state
+          example: "Leader"
+        current_term:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Current term number
+          example: 5
+        leader_id:
+          type: string
+          nullable: true
+          description: ID of current leader (null if no leader known)
+          example: "node1"
+        cluster_peers:
+          type: array
+          items:
+            type: string
+          description: List of peer node IDs in cluster (excluding self)
+          example: ["node2", "node3"]
+      description: Status information for monitoring and visualization
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: "Invalid request: missing required field 'term'"
+        code:
+          type: string
+          description: Machine-readable error code
+          example: "INVALID_REQUEST"
+      description: Error response format
+
+  securitySchemes: {}
+
+security: []
