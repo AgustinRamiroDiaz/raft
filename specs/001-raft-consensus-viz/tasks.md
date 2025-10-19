@@ -25,12 +25,12 @@
 
 **Purpose**: Initialize Rust project with required dependencies and structure
 
-- [ ] T001 Create `raft-node/` directory and initialize Cargo project
-- [ ] T002 Configure Cargo.toml with dependencies: rocket 0.5.1, clap 4.5, serde 1.0, reqwest 0.12 (blocking), crossbeam-channel, dotenvy, tracing, tracing-subscriber, anyhow, thiserror, rand 0.8
-- [ ] T003 [P] Create source directory structure: `src/raft/`, `src/rpc/`, `src/http/`, `src/config/`, `src/threading/`
-- [ ] T004 [P] Create test directory structure: `tests/unit/`, `tests/integration/`, `tests/contract/`
-- [ ] T005 [P] Create `.env.example` with configuration template (NODE_ID, NODE_ADDRESS, CLUSTER_PEERS, ELECTION_TIMEOUT_MS, HEARTBEAT_INTERVAL_MS, RUST_LOG)
-- [ ] T006 Configure clippy and rustfmt in Cargo.toml
+- [x] T001 Create `raft-node/` directory and initialize Cargo project
+- [x] T002 Configure Cargo.toml with dependencies: rocket 0.5.1, clap 4.5, serde 1.0, reqwest 0.12 (blocking), crossbeam-channel, dotenvy, tracing, tracing-subscriber, anyhow, thiserror, rand 0.8
+- [x] T003 [P] Create source directory structure: `src/raft/`, `src/rpc/`, `src/http/`, `src/config/`, `src/threading/`
+- [x] T004 [P] Create test directory structure: `tests/unit/`, `tests/integration/`, `tests/contract/`
+- [x] T005 [P] Create `.env.example` with configuration template (NODE_ID, NODE_ADDRESS, CLUSTER_PEERS, ELECTION_TIMEOUT_MS, HEARTBEAT_INTERVAL_MS, RUST_LOG)
+- [x] T006 Configure clippy and rustfmt in Cargo.toml
 
 **Checkpoint**: Project structure ready for implementation
 
