@@ -42,14 +42,14 @@
 
 **⚠️ CRITICAL**: No User Story 1 work can begin until this phase is complete
 
-- [ ] T007 [P] Implement Term and NodeId type aliases in `raft-node/src/raft/types.rs`
-- [ ] T008 [P] Implement NodeState enum (Follower, Candidate, Leader) with state transition logic in `raft-node/src/raft/state.rs`
-- [ ] T009 [P] Implement RaftConfig struct with environment variable loading in `raft-node/src/config/mod.rs`
-- [ ] T010 [P] Implement RequestVote and RequestVoteResponse structs in `raft-node/src/rpc/messages.rs`
-- [ ] T011 [P] Implement AppendEntries and AppendEntriesResponse structs in `raft-node/src/rpc/messages.rs`
-- [ ] T012 [P] Define RaftCommand enum (SendRequestVote, SendAppendEntries) in `raft-node/src/rpc/messages.rs`
-- [ ] T013 [P] Define RaftEvent enum (ReceivedRequestVote, ReceivedAppendEntries, ElectionTimeout, HeartbeatTimeout) in `raft-node/src/rpc/messages.rs`
-- [ ] T014 Implement logging infrastructure with tracing in `raft-node/src/lib.rs`
+- [x] T007 [P] Implement Term newtype in `raft-node/src/raft/term.rs`
+- [x] T008 [P] Implement NodeId type in `raft-node/src/raft/node_id.rs`
+- [x] T009 [P] Implement NodeState enum (Follower, Candidate, Leader) in `raft-node/src/raft/state.rs`
+- [x] T010 [P] Implement RaftConfig struct with environment variable loading in `raft-node/src/config/mod.rs`
+- [x] T011 [P] Implement RequestVote and AppendEntries RPC message structs in `raft-node/src/rpc/messages.rs`
+- [x] T012 [P] Implement RaftEvent enum (timeout and RPC events) in `raft-node/src/raft/events.rs`
+- [x] T013 [P] Define Transport trait for dependency injection in `raft-node/src/rpc/transport.rs`
+- [x] T014 Implement logging infrastructure with tracing in `raft-node/src/main.rs`
 
 **Checkpoint**: Foundation ready - User Story 1 implementation can now begin
 
