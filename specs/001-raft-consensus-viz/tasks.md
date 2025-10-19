@@ -76,13 +76,13 @@
 
 ### Core Raft State Machine (US1)
 
-- [ ] T023 [US1] Implement RaftState struct in `raft-node/src/raft/node.rs` (current_term, voted_for, state, leader_id, votes_received, node_id, cluster_peers)
-- [ ] T024 [US1] Implement RaftState::new() constructor in `raft-node/src/raft/node.rs`
-- [ ] T025 [US1] Implement RaftState::start_election() in `raft-node/src/raft/node.rs` (increment term, become Candidate, vote for self)
-- [ ] T026 [US1] Implement RaftState::handle_request_vote() in `raft-node/src/raft/node.rs` (grant vote if term valid and haven't voted)
-- [ ] T027 [US1] Implement RaftState::handle_vote_response() in `raft-node/src/raft/election.rs` (count votes, become Leader if majority)
-- [ ] T028 [US1] Implement RaftState::handle_append_entries() in `raft-node/src/raft/node.rs` (reset election timer, update term, revert to Follower if needed)
-- [ ] T029 [US1] Implement RaftState::step_down() in `raft-node/src/raft/node.rs` (revert to Follower, update term)
+- [x] T023 [US1] Implement RaftState struct in `raft-node/src/raft/node.rs` (current_term, voted_for, state, leader_id, votes_received, node_id, cluster_peers)
+- [x] T024 [US1] Implement RaftState::new() constructor in `raft-node/src/raft/node.rs`
+- [x] T025 [US1] Implement RaftState::start_election() in `raft-node/src/raft/node.rs` (increment term, become Candidate, vote for self)
+- [x] T026 [US1] Implement RaftState::handle_request_vote() in `raft-node/src/raft/node.rs` (grant vote if term valid and haven't voted)
+- [x] T027 [US1] Implement RaftState::handle_vote_response() in `raft-node/src/raft/node.rs` (count votes, become Leader if majority)
+- [x] T028 [US1] Implement RaftState::handle_append_entries() in `raft-node/src/raft/node.rs` (reset election timer, update term, revert to Follower if needed)
+- [x] T029 [US1] Implement RaftState::step_down() in `raft-node/src/raft/node.rs` (revert to Follower, update term)
 
 ### Timer Threads (US1)
 
