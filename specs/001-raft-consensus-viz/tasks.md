@@ -65,14 +65,14 @@
 
 **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T015 [P] [US1] Unit test for NodeState transitions (Follower→Candidate→Leader) in `raft-node/src/raft/state.rs` #[cfg(test)]
-- [ ] T016 [P] [US1] Unit test for term incrementing on election start in `raft-node/src/raft/node.rs` #[cfg(test)]
-- [ ] T017 [P] [US1] Unit test for vote granting logic in `raft-node/src/raft/node.rs` #[cfg(test)]
-- [ ] T018 [P] [US1] Unit test for majority calculation in `raft-node/src/raft/election.rs` #[cfg(test)]
-- [ ] T019 [P] [US1] Contract test for RequestVote RPC schema in `raft-node/tests/contract/rpc_schema_test.rs`
-- [ ] T020 [P] [US1] Contract test for AppendEntries RPC schema in `raft-node/tests/contract/rpc_schema_test.rs`
-- [ ] T021 [US1] Integration test for 3-node leader election in `raft-node/tests/integration/election_test.rs`
-- [ ] T022 [US1] Integration test for leader re-election after failure in `raft-node/tests/integration/election_test.rs`
+- [x] T015 [P] [US1] Unit test for NodeState transitions (Follower→Candidate→Leader) in `raft-node/src/raft/state.rs` #[cfg(test)]
+- [x] T016 [P] [US1] Unit test for term incrementing on election start in `raft-node/src/raft/node.rs` #[cfg(test)]
+- [x] T017 [P] [US1] Unit test for vote granting logic in `raft-node/src/raft/node.rs` #[cfg(test)]
+- [x] T018 [P] [US1] Unit test for majority calculation in `raft-node/src/raft/election.rs` #[cfg(test)]
+- [x] T019 [P] [US1] Contract test for RequestVote RPC schema in `raft-node/tests/contract/rpc_schema_test.rs`
+- [x] T020 [P] [US1] Contract test for AppendEntries RPC schema in `raft-node/tests/contract/rpc_schema_test.rs`
+- [x] T021 [US1] Integration test for 3-node leader election in `raft-node/tests/integration/election_test.rs`
+- [x] T022 [US1] Integration test for leader re-election after failure in `raft-node/tests/integration/election_test.rs`
 
 ### Core Raft State Machine (US1)
 
