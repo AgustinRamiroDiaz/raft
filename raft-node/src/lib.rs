@@ -4,8 +4,10 @@
 //! leader election and term management (without log replication).
 
 pub mod config;
+pub mod http;
 pub mod raft;
 pub mod rpc;
+pub mod threading;
 
 // Re-export commonly used types for convenience
 pub use config::RaftConfig;
