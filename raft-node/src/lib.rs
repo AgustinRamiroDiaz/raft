@@ -11,6 +11,5 @@ pub mod rpc;
 pub use config::RaftConfig;
 pub use raft::{has_majority, NodeId, NodeState, RaftEvent, RaftState, Term};
 pub use rpc::{
-    AppendEntriesRequest, AppendEntriesResponse, RequestVoteRequest, RequestVoteResponse,
-    Transport,
+    AppendEntriesRequest, AppendEntriesResponse, RequestVoteRequest, RequestVoteResponse, Transport,
 };

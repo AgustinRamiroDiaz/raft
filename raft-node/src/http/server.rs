@@ -84,29 +84,23 @@ pub fn spawn_server(
 }
 
 /// Handle POST /raft/request_vote
-fn handle_request_vote(
-    request: &rouille::Request,
-    state: ServerState,
-) -> rouille::Response {
+fn handle_request_vote(request: &rouille::Request, state: ServerState) -> rouille::Response {
     // Parse JSON request body
     let mut body = String::new();
     if let Some(mut data) = request.data() {
         if let Err(e) = data.read_to_string(&mut body) {
             tracing::error!(error = %e, "Failed to read request body");
-            return rouille::Response::text("Failed to read request body")
-                .with_status_code(400);
+            return rouille::Response::text("Failed to read request body").with_status_code(400);
         }
     } else {
-        return rouille::Response::text("No request body")
-            .with_status_code(400);
+        return rouille::Response::text("No request body").with_status_code(400);
     }
 
     let request_data: RequestVoteRequest = match serde_json::from_str(&body) {
         Ok(data) => data,
         Err(e) => {
             tracing::error!(error = %e, "Failed to parse JSON");
-            return rouille::Response::text(format!("Invalid JSON: {}", e))
-                .with_status_code(400);
+            return rouille::Response::text(format!("Invalid JSON: {}", e)).with_status_code(400);
         }
     };
 
@@ -131,29 +125,23 @@ fn handle_request_vote(
 }
 
 /// Handle POST /raft/append_entries
-fn handle_append_entries(
-    request: &rouille::Request,
-    state: ServerState,
-) -> rouille::Response {
+fn handle_append_entries(request: &rouille::Request, state: ServerState) -> rouille::Response {
     // Parse JSON request body
     let mut body = String::new();
     if let Some(mut data) = request.data() {
         if let Err(e) = data.read_to_string(&mut body) {
             tracing::error!(error = %e, "Failed to read request body");
-            return rouille::Response::text("Failed to read request body")
-                .with_status_code(400);
+            return rouille::Response::text("Failed to read request body").with_status_code(400);
         }
     } else {
-        return rouille::Response::text("No request body")
-            .with_status_code(400);
+        return rouille::Response::text("No request body").with_status_code(400);
     }
 
     let request_data: AppendEntriesRequest = match serde_json::from_str(&body) {
         Ok(data) => data,
         Err(e) => {
             tracing::error!(error = %e, "Failed to parse JSON");
-            return rouille::Response::text(format!("Invalid JSON: {}", e))
-                .with_status_code(400);
+            return rouille::Response::text(format!("Invalid JSON: {}", e)).with_status_code(400);
         }
     };
 

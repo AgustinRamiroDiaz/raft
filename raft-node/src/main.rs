@@ -46,8 +46,8 @@ fn main() -> Result<()> {
     tracing::info!("Starting Raft node");
 
     // Load configuration from environment
-    let config = config::RaftConfig::from_env()
-        .context("Failed to load configuration from environment")?;
+    let config =
+        config::RaftConfig::from_env().context("Failed to load configuration from environment")?;
 
     tracing::info!(
         node_id = %config.node_id,
@@ -59,10 +59,7 @@ fn main() -> Result<()> {
     // Create HTTP client transport
     let mut peer_addresses = HashMap::new();
     for peer in &config.peers {
-        peer_addresses.insert(
-            peer.node_id.clone(),
-            format!("http://{}", peer.address),
-        );
+        peer_addresses.insert(peer.node_id.clone(), format!("http://{}", peer.address));
     }
     let transport = Arc::new(http::client::HttpClient::new(peer_addresses));
 

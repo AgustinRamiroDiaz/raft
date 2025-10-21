@@ -155,8 +155,14 @@ mod tests {
 
         let client = HttpClient::new(peers);
 
-        assert_eq!(client.peer_url(&"node1".into()), Some("http://127.0.0.1:8001"));
-        assert_eq!(client.peer_url(&"node2".into()), Some("http://127.0.0.1:8002"));
+        assert_eq!(
+            client.peer_url(&"node1".into()),
+            Some("http://127.0.0.1:8001")
+        );
+        assert_eq!(
+            client.peer_url(&"node2".into()),
+            Some("http://127.0.0.1:8002")
+        );
         assert_eq!(client.peer_url(&"node3".into()), None);
     }
 

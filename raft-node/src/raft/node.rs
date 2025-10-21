@@ -200,11 +200,7 @@ impl RaftState {
     /// 3. If we now have majority, become Leader
     ///
     /// Returns true if we became leader, false otherwise
-    pub fn handle_vote_response(
-        &mut self,
-        from: &NodeId,
-        response: &RequestVoteResponse,
-    ) -> bool {
+    pub fn handle_vote_response(&mut self, from: &NodeId, response: &RequestVoteResponse) -> bool {
         // If response has higher term, step down
         if response.term > self.current_term {
             tracing::info!(
@@ -296,7 +292,10 @@ impl RaftState {
     /// 4. Reset election timeout (caller's responsibility)
     ///
     /// Returns the response to send back
-    pub fn handle_append_entries(&mut self, request: &AppendEntriesRequest) -> AppendEntriesResponse {
+    pub fn handle_append_entries(
+        &mut self,
+        request: &AppendEntriesRequest,
+    ) -> AppendEntriesResponse {
         // Rule 1: Reject if request term is older
         if request.term < self.current_term {
             tracing::debug!(
@@ -457,7 +456,12 @@ mod tests {
     #[test]
     fn test_handle_vote_response_not_yet_majority() {
         let node_id = "node1".into();
-        let peers = vec!["node2".into(), "node3".into(), "node4".into(), "node5".into()];
+        let peers = vec![
+            "node2".into(),
+            "node3".into(),
+            "node4".into(),
+            "node5".into(),
+        ];
         let mut state = RaftState::new(node_id, peers);
 
         // Start election (5-node cluster, need 3 votes for majority)

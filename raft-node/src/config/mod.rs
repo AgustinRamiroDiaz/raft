@@ -63,8 +63,8 @@ impl RaftConfig {
         let node_address =
             std::env::var("NODE_ADDRESS").context("NODE_ADDRESS environment variable not set")?;
 
-        let peers_str = std::env::var("CLUSTER_PEERS")
-            .context("CLUSTER_PEERS environment variable not set")?;
+        let peers_str =
+            std::env::var("CLUSTER_PEERS").context("CLUSTER_PEERS environment variable not set")?;
 
         let peers = Self::parse_peers(&peers_str)?;
 

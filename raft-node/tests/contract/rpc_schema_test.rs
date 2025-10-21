@@ -85,8 +85,7 @@ fn test_append_entries_response_schema() {
     let response = AppendEntriesResponse::new(Term::new(10), true);
 
     // Serialize to JSON
-    let json =
-        serde_json::to_string(&response).expect("Failed to serialize AppendEntriesResponse");
+    let json = serde_json::to_string(&response).expect("Failed to serialize AppendEntriesResponse");
 
     // Verify JSON structure
     assert!(json.contains("\"term\""));
