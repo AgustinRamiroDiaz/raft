@@ -102,18 +102,18 @@
 
 ### Raft Core Event Loop (US1)
 
-- [ ] T040 [US1] Implement main Raft event loop in `raft-node/src/raft/node.rs` (receive RaftEvent via crossbeam channel, dispatch to handlers)
-- [ ] T041 [US1] Implement ElectionTimeout handler in `raft-node/src/raft/node.rs` (call start_election, send RequestVote to all peers)
-- [ ] T042 [US1] Implement HeartbeatTimeout handler in `raft-node/src/raft/node.rs` (send AppendEntries to all peers if Leader)
-- [ ] T043 [US1] Implement ReceivedRequestVote handler in `raft-node/src/raft/node.rs` (call handle_request_vote, send response via oneshot channel)
-- [ ] T044 [US1] Implement ReceivedAppendEntries handler in `raft-node/src/raft/node.rs` (call handle_append_entries, reset election timer, send response)
-- [ ] T045 [US1] Connect RaftCommand sender to HTTP client thread in `raft-node/src/threading/mod.rs` (process SendRequestVote and SendAppendEntries commands)
+- [X] T040 [US1] Implement main Raft event loop in `raft-node/src/raft/event_loop.rs` (receive RaftEvent via crossbeam channel, dispatch to handlers)
+- [X] T041 [US1] Implement ElectionTimeout handler in `raft-node/src/raft/event_loop.rs` (call start_election, send RequestVote to all peers)
+- [X] T042 [US1] Implement HeartbeatTimeout handler in `raft-node/src/raft/event_loop.rs` (send AppendEntries to all peers if Leader)
+- [X] T043 [US1] Implement ReceivedRequestVote handler in `raft-node/src/raft/event_loop.rs` (call handle_request_vote, send response via channel)
+- [X] T044 [US1] Implement ReceivedAppendEntries handler in `raft-node/src/raft/event_loop.rs` (call handle_append_entries, reset election timer, send response)
+- [X] T045 [US1] Integrated HTTP transport directly in event loop handlers (synchronous RPC sending)
 
 ### CLI & Main Entrypoint (US1)
 
-- [ ] T046 [US1] Implement CLI with clap in `raft-node/src/main.rs` (parse --env flag, display help/version)
-- [ ] T047 [US1] Implement main() function orchestration in `raft-node/src/main.rs` (load config, spawn timers, spawn HTTP server, spawn Raft event loop, run until signal)
-- [ ] T048 [US1] Implement graceful shutdown on SIGINT/SIGTERM in `raft-node/src/main.rs`
+- [X] T046 [US1] Implement CLI with clap in `raft-node/src/main.rs` (parse --env flag, display help/version)
+- [X] T047 [US1] Implement main() function orchestration in `raft-node/src/main.rs` (load config, spawn timers, spawn HTTP server, spawn Raft event loop, run until signal)
+- [X] T048 [US1] Implement graceful shutdown on SIGINT/SIGTERM in `raft-node/src/main.rs`
 
 ### Integration & Testing (US1)
 

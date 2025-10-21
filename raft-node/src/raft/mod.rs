@@ -1,6 +1,7 @@
 //! Core Raft consensus algorithm implementation
 
 pub mod election;
+pub mod event_loop;
 pub mod events;
 pub mod node;
 pub mod node_id;

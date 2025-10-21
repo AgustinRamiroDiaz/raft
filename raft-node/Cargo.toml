@@ -35,6 +35,9 @@ crossbeam-channel = "0.5"
 # Random (for election timeout)
 rand = "0.8"
 
+# Signal handling (Ctrl+C)
+ctrlc = "3.4"
+
 [dev-dependencies]
 # Testing utilities
 # (none currently)
