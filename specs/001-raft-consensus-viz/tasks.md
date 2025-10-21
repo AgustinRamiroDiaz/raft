@@ -86,19 +86,19 @@
 
 ### Timer Threads (US1)
 
-- [ ] T030 [P] [US1] Implement election timer thread in `raft-node/src/threading/timers.rs` (randomized 150-300ms timeout, sends ElectionTimeout event)
-- [ ] T031 [P] [US1] Implement heartbeat timer thread in `raft-node/src/threading/timers.rs` (50ms interval, sends HeartbeatTimeout event, only runs when Leader)
-- [ ] T032 [US1] Implement timer reset mechanism in `raft-node/src/threading/mod.rs` (receive reset signals from Raft core)
+- [X] T030 [P] [US1] Implement election timer thread in `raft-node/src/threading/timers.rs` (randomized 150-300ms timeout, sends ElectionTimeout event)
+- [X] T031 [P] [US1] Implement heartbeat timer thread in `raft-node/src/threading/timers.rs` (50ms interval, sends HeartbeatTimeout event, only runs when Leader)
+- [X] T032 [US1] Implement timer reset mechanism in `raft-node/src/threading/mod.rs` (receive reset signals from Raft core)
 
 ### HTTP Transport Layer (US1)
 
-- [ ] T033 [P] [US1] Define Transport trait in `raft-node/src/rpc/transport.rs` (send_request_vote, send_append_entries methods)
-- [ ] T034 [US1] Implement HTTP client (reqwest blocking) implementing Transport trait in `raft-node/src/http/client.rs`
-- [ ] T035 [US1] Implement Rocket HTTP server with POST /raft/request_vote endpoint in `raft-node/src/http/server.rs`
-- [ ] T036 [US1] Implement POST /raft/append_entries endpoint in `raft-node/src/http/server.rs`
-- [ ] T037 [US1] Implement GET /ops/status endpoint (returns NodeStatus JSON) in `raft-node/src/http/server.rs`
-- [ ] T038 [US1] Implement GET /ops/health endpoint in `raft-node/src/http/server.rs`
-- [ ] T039 [US1] Configure Rocket server to run in dedicated thread with state sharing via Arc<Mutex<>> in `raft-node/src/http/server.rs`
+- [X] T033 [P] [US1] Define Transport trait in `raft-node/src/rpc/transport.rs` (send_request_vote, send_append_entries methods)
+- [X] T034 [US1] Implement HTTP client (reqwest blocking) implementing Transport trait in `raft-node/src/http/client.rs`
+- [X] T035 [US1] Implement Rocket HTTP server with POST /raft/request_vote endpoint in `raft-node/src/http/server.rs`
+- [X] T036 [US1] Implement POST /raft/append_entries endpoint in `raft-node/src/http/server.rs`
+- [X] T037 [US1] Implement GET /ops/status endpoint (returns NodeStatus JSON) in `raft-node/src/http/server.rs`
+- [X] T038 [US1] Implement GET /ops/health endpoint in `raft-node/src/http/server.rs`
+- [X] T039 [US1] Implement Rocket HTTP server to run in dedicated thread with state sharing via Arc<Mutex<>> in `raft-node/src/http/server.rs`
 
 ### Raft Core Event Loop (US1)
 

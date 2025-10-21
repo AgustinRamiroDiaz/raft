@@ -4,8 +4,10 @@
 //! and term management, without log replication.
 
 mod config;
+mod http;
 mod raft;
 mod rpc;
+mod threading;
 
 use anyhow::Result;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};

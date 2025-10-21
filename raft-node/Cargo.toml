@@ -8,8 +8,8 @@ rust-version = "1.90"
 # CLI
 clap = { version = "4.5", features = ["derive", "env"] }
 
-# HTTP Server
-rocket = { version = "0.5.1", features = ["json"] }
+# HTTP Server (synchronous)
+rouille = "3.6"
 
 # HTTP Client (blocking mode)
 reqwest = { version = "0.12", features = ["blocking", "json"] }
