@@ -11,7 +11,7 @@ use crate::rpc::messages::{AppendEntriesRequest, RequestVoteRequest};
 use crate::rpc::transport::Transport;
 use crossbeam_channel::Receiver;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 /// Commands sent from Raft core to the RPC sender thread
 #[derive(Debug, Clone)]
@@ -38,7 +38,7 @@ pub enum RaftCommand {
 /// - HTTP client thread (RPC responses)
 ///
 /// # Arguments
-/// * `raft_state` - The Raft state machine (owned by this thread)
+/// * `raft_state` - The Raft state machine (shared with HTTP server)
 /// * `event_receiver` - Channel receiving events from other threads
 /// * `command_sender` - Channel sending RPC commands to HTTP client thread
 /// * `election_reset` - Atomic flag to reset election timer
@@ -46,13 +46,14 @@ pub enum RaftCommand {
 /// # Returns
 /// Returns when Shutdown event is received
 pub fn run_event_loop<T: Transport>(
-    mut raft_state: RaftState,
+    raft_state: Arc<Mutex<RaftState>>,
     event_receiver: Receiver<RaftEvent>,
     transport: Arc<T>,
     election_reset: Arc<AtomicBool>,
 ) {
+    let node_id = raft_state.lock().unwrap().node_id.clone();
     tracing::info!(
-        node_id = %raft_state.node_id,
+        node_id = %node_id,
         "Raft event loop started"
     );
 
@@ -71,11 +72,13 @@ pub fn run_event_loop<T: Transport>(
         // Process event
         match event {
             RaftEvent::ElectionTimeout => {
-                handle_election_timeout(&mut raft_state, transport.as_ref());
+                let mut state = raft_state.lock().unwrap();
+                handle_election_timeout(&mut state, transport.as_ref());
             }
 
             RaftEvent::HeartbeatTimeout => {
-                handle_heartbeat_timeout(&mut raft_state, transport.as_ref());
+                let mut state = raft_state.lock().unwrap();
+                handle_heartbeat_timeout(&mut state, transport.as_ref());
             }
 
             RaftEvent::RequestVoteReceived {
@@ -83,11 +86,13 @@ pub fn run_event_loop<T: Transport>(
                 request,
                 response_tx,
             } => {
-                handle_request_vote_received(&mut raft_state, from, request, response_tx);
+                let mut state = raft_state.lock().unwrap();
+                handle_request_vote_received(&mut state, from, request, response_tx);
             }
 
             RaftEvent::RequestVoteResponse { from, response } => {
-                handle_request_vote_response(&mut raft_state, from, response);
+                let mut state = raft_state.lock().unwrap();
+                handle_request_vote_response(&mut state, from, response);
             }
 
             RaftEvent::AppendEntriesReceived {
@@ -95,8 +100,9 @@ pub fn run_event_loop<T: Transport>(
                 request,
                 response_tx,
             } => {
+                let mut state = raft_state.lock().unwrap();
                 handle_append_entries_received(
-                    &mut raft_state,
+                    &mut state,
                     from,
                     request,
                     response_tx,
@@ -105,7 +111,8 @@ pub fn run_event_loop<T: Transport>(
             }
 
             RaftEvent::AppendEntriesResponse { from, response } => {
-                handle_append_entries_response(&mut raft_state, from, response);
+                let mut state = raft_state.lock().unwrap();
+                handle_append_entries_response(&mut state, from, response);
             }
 
             RaftEvent::Shutdown => {
@@ -116,7 +123,7 @@ pub fn run_event_loop<T: Transport>(
     }
 
     tracing::info!(
-        node_id = %raft_state.node_id,
+        node_id = %node_id,
         "Raft event loop stopped"
     );
 }

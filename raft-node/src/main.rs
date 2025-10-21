@@ -63,9 +63,8 @@ fn main() -> Result<()> {
     }
     let transport = Arc::new(http::client::HttpClient::new(peer_addresses));
 
-    // Create Raft state (one for event loop, one shared with HTTP server)
+    // Create Raft state (shared between event loop and HTTP server)
     let peer_ids: Vec<_> = config.peers.iter().map(|p| p.node_id.clone()).collect();
-    let raft_state = RaftState::new(config.node_id.clone(), peer_ids.clone());
     let raft_state_shared = Arc::new(Mutex::new(RaftState::new(config.node_id.clone(), peer_ids)));
 
     // Create event channel (for sending events to Raft core)
@@ -117,7 +116,7 @@ fn main() -> Result<()> {
     tracing::info!("Raft node fully initialized, entering event loop");
 
     // Run the main event loop (blocks until shutdown)
-    run_event_loop(raft_state, event_rx, transport, election_reset);
+    run_event_loop(raft_state_shared, event_rx, transport, election_reset);
 
     // Signal shutdown to timer threads
     shutdown_flag.store(true, std::sync::atomic::Ordering::Relaxed);

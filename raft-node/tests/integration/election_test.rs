@@ -36,8 +36,7 @@ impl TestNode {
 
         let transport = Arc::new(http::client::HttpClient::new(peer_addresses));
 
-        // Create Raft states
-        let raft_state = RaftState::new(node_id.into(), peer_ids.clone());
+        // Create Raft state (SHARED between event loop and HTTP server)
         let raft_state_shared = Arc::new(Mutex::new(RaftState::new(node_id.into(), peer_ids)));
 
         // Create event channel
@@ -71,8 +70,9 @@ impl TestNode {
 
         // Spawn event loop in background
         let event_loop_election_reset = election_reset.clone();
+        let event_loop_raft_state = raft_state_shared.clone();
         let event_loop_handle = thread::spawn(move || {
-            run_event_loop(raft_state, event_rx, transport, event_loop_election_reset);
+            run_event_loop(event_loop_raft_state, event_rx, transport, event_loop_election_reset);
         });
 
         Self {
@@ -99,7 +99,7 @@ impl TestNode {
 
 // T021: Integration test for 3-node leader election
 #[test]
-#[ignore = "Requires network access - sandbox limitation prevents HTTP communication"]
+#[ignore = "HTTP communication fails in sandbox - nodes become Candidates but can't exchange votes"]
 fn test_three_node_cluster_elects_leader() {
     // Start 3 Raft nodes
     let node1 = TestNode::new(
@@ -121,13 +121,21 @@ fn test_three_node_cluster_elects_leader() {
     );
 
     // Wait for leader election (max 10 seconds)
-    thread::sleep(Duration::from_secs(5));
+    thread::sleep(Duration::from_secs(2));
 
     // Check cluster state
+    let state1 = node1.get_state();
+    let state2 = node2.get_state();
+    let state3 = node3.get_state();
+
+    eprintln!("Node1 state: {:?}, term: {}", state1, node1.get_term());
+    eprintln!("Node2 state: {:?}, term: {}", state2, node2.get_term());
+    eprintln!("Node3 state: {:?}, term: {}", state3, node3.get_term());
+
     let states = vec![
-        (node1.node_id.clone(), node1.get_state()),
-        (node2.node_id.clone(), node2.get_state()),
-        (node3.node_id.clone(), node3.get_state()),
+        (node1.node_id.clone(), state1),
+        (node2.node_id.clone(), state2),
+        (node3.node_id.clone(), state3),
     ];
 
     // Count leaders
@@ -162,7 +170,7 @@ fn test_three_node_cluster_elects_leader() {
 
 // T022: Integration test for leader re-election after failure
 #[test]
-#[ignore = "Requires network access - sandbox limitation prevents HTTP communication"]
+#[ignore = "HTTP communication fails in sandbox - nodes become Candidates but can't exchange votes"]
 fn test_leader_reelection_after_failure() {
     // Start 3-node cluster
     let node1 = TestNode::new(
@@ -239,18 +247,3 @@ fn test_leader_reelection_after_failure() {
     }
 }
 
-#[test]
-#[ignore = "Complex test requiring network partition simulation"]
-fn test_cluster_with_network_partition() {
-    // This test would require network partition simulation
-    // which is beyond the scope of basic integration tests
-    // Left as placeholder for future implementation
-}
-
-#[test]
-#[ignore = "Complex test requiring precise timing control"]
-fn test_concurrent_elections() {
-    // This test would require precise timing control to force
-    // concurrent elections, which is difficult in integration tests
-    // Left as placeholder for future implementation
-}
