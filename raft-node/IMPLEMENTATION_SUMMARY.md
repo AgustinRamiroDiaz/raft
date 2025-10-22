@@ -88,7 +88,7 @@ raft-node/src/
 
 ## Test Coverage
 
-### Automated Tests: ✅ 74/74 Passing
+### Automated Tests: ✅ 76/76 Passing
 
 - **61 Unit Tests** - Core logic validation
   - Raft state transitions
@@ -114,11 +114,9 @@ raft-node/src/
   - `test_leader_heartbeat_resets_election()` - Heartbeat handling
   - `test_five_node_cluster_requires_three_votes()` - 5-node majority calculation
 
-- **4 HTTP-Based Integration Tests** - ✅ Fully implemented (marked as #[ignore] due to sandbox)
-  - `test_three_node_cluster_elects_leader()` - Complete with TestNode helper
-  - `test_leader_reelection_after_failure()` - Complete with failure simulation
-  - `test_cluster_with_network_partition()` - Placeholder for future enhancement
-  - `test_concurrent_elections()` - Placeholder for future enhancement
+- **2 HTTP-Based Integration Tests** - ✅ All passing in sandbox!
+  - `test_three_node_cluster_elects_leader()` - 3-node cluster elects leader in <1s
+  - `test_leader_reelection_after_failure()` - New leader elected after failure
 
 **Integration Test Infrastructure:**
 - **Mock-based tests** use custom MockTransport implementations (no network required)
@@ -282,6 +280,6 @@ All 62 tasks completed successfully:
 ---
 
 **Branch**: `001-raft-consensus-viz`
-**Commits**: 8 major milestones
-**Lines of Code**: ~2950 (including tests)
-**Test Coverage**: 74 automated tests (61 unit + 7 contract + 6 mock integration + 4 HTTP integration ignored)
+**Commits**: 11 major milestones
+**Lines of Code**: ~3000 (including tests)
+**Test Coverage**: 76 automated tests - ALL PASSING (61 unit + 7 contract + 8 integration)
