@@ -99,7 +99,6 @@ impl TestNode {
 
 // T021: Integration test for 3-node leader election
 #[test]
-#[ignore = "HTTP communication fails in sandbox - nodes become Candidates but can't exchange votes"]
 fn test_three_node_cluster_elects_leader() {
     // Start 3 Raft nodes
     let node1 = TestNode::new(
@@ -120,8 +119,8 @@ fn test_three_node_cluster_elects_leader() {
         vec![("node1".to_string(), 9001), ("node2".to_string(), 9002)],
     );
 
-    // Wait for leader election (max 10 seconds)
-    thread::sleep(Duration::from_secs(2));
+    // Wait for leader election (election timeout is 150-300ms, allow multiple rounds)
+    thread::sleep(Duration::from_secs(1));
 
     // Check cluster state
     let state1 = node1.get_state();
@@ -170,7 +169,6 @@ fn test_three_node_cluster_elects_leader() {
 
 // T022: Integration test for leader re-election after failure
 #[test]
-#[ignore = "HTTP communication fails in sandbox - nodes become Candidates but can't exchange votes"]
 fn test_leader_reelection_after_failure() {
     // Start 3-node cluster
     let node1 = TestNode::new(
@@ -192,7 +190,7 @@ fn test_leader_reelection_after_failure() {
     );
 
     // Wait for initial leader election
-    thread::sleep(Duration::from_secs(3));
+    thread::sleep(Duration::from_millis(500));
 
     // Find the leader
     let initial_leader = if node1.get_state() == NodeState::Leader {

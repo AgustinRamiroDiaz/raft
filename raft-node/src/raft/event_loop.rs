@@ -87,7 +87,7 @@ pub fn run_event_loop<T: Transport>(
                 response_tx,
             } => {
                 let mut state = raft_state.lock().unwrap();
-                handle_request_vote_received(&mut state, from, request, response_tx);
+                handle_request_vote_received(&mut state, from, request, response_tx, &election_reset);
             }
 
             RaftEvent::RequestVoteResponse { from, response } => {
@@ -225,6 +225,7 @@ fn handle_request_vote_received(
     from: NodeId,
     request: RequestVoteRequest,
     response_tx: std::sync::mpsc::Sender<crate::rpc::messages::RequestVoteResponse>,
+    election_reset: &Arc<AtomicBool>,
 ) {
     tracing::debug!(
         from = %from,
@@ -235,6 +236,18 @@ fn handle_request_vote_received(
 
     // Call handler
     let response = raft_state.handle_request_vote(&request);
+
+    // CRITICAL: Reset election timer if we granted the vote
+    // This prevents the node from immediately starting its own election
+    // and competing with the candidate it just voted for
+    if response.vote_granted {
+        tracing::debug!(
+            node_id = %raft_state.node_id,
+            candidate = %request.candidate_id,
+            "Granted vote, resetting election timer"
+        );
+        election_reset.store(true, Ordering::Relaxed);
+    }
 
     // Send response back to HTTP thread
     if response_tx.send(response).is_err() {
